@@ -1,5 +1,29 @@
+variable "login_info" {
+  type = object({
+    subscription_id = string
+    client_id       = string
+    client_secret   = string
+    tenant_id       = string
+  })
+  sensitive = true
+}
+
 provider "azurerm" {
-  version = "2.0"
+  features {
+  }
+  subscription_id = var.login_info.subscription_id
+  client_id       = var.login_info.client_id
+  client_secret   = var.login_info.client_secret
+  tenant_id       = var.login_info.tenant_id
+}
+
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "=3.0.0"
+    }
+  }
 }
 
 resource "azurerm_resource_group" "example" {
@@ -18,7 +42,7 @@ resource "azurerm_subnet" "example" {
   name                 = "example-subnet"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
-  address_prefix       = "10.0.1.0/24"
+  address_prefixes       = ["10.0.1.0/24"]
 }
 
 resource "azurerm_network_security_group" "example" {
